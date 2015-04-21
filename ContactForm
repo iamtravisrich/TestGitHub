@@ -1,0 +1,68 @@
+$(document).ready(function() {
+	
+	$("#contactform").validate(
+	   {
+		rules:{
+		  name: {
+	   	  required: true,
+	      minlength: 3
+				},
+				
+		  email: {
+	      required: true,
+		  email: true	
+				},
+				
+	      message: {
+		  required: true,
+		  minlength: 5
+				}
+		 }
+	});
+
+
+ $("#contactform").submit(function(event){
+	event.preventDefault();
+	
+	var formData = {
+		name : $('input[name=name]').val(),
+		email : $('input[name=email]').val(),
+		msg : $('#message').val()		
+	};	
+	$.ajax({
+	    url: 'process.php',
+	    type: 'POST',
+	    dataType: 'json',
+	    data: formData,
+		beforeSend: function(data){
+	      if($("#name").val() && $("#email").val() && $("#message").val() !=''){
+		  $("#results").html("<p style='padding:10px;'>Sending....</p>");
+		  }
+		},
+		success:function(data){
+			if(data.success == true){
+		    $("#results").html(data.message);
+			clearform();
+			}
+		},
+		error: function(data){
+		  if(data.success == false){
+		   if(data.errors.name){
+			 $("#results").html(data.errors.name);
+		   }
+		   if(data.errors.email){
+			 $("#results").html(data.errors.email);
+		   }
+		   if(data.errors.message){
+			 $("#results").html(data.errors.message);
+		   }
+		 }
+		}
+	  });	 
+   });
+});
+
+
+function clearform(){
+	$("#name, #email, #message").val('');
+}
